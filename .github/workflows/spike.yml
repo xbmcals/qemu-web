@@ -24,7 +24,7 @@ jobs:
       EMSDK_VERSION: ${{ inputs.emsdk_version || 'latest' }}
     defaults:
       run:
-        working-directory: qemu-wasm64-spike
+          working-directory: qemu-web/qemu-wasm64-spike
     steps:
       - uses: actions/checkout@v4
 
