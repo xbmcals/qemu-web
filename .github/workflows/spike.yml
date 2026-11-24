@@ -1,4 +1,4 @@
-name: wasm64 spike
+name: wasm spike
 
 on:
   workflow_dispatch:
@@ -6,6 +6,8 @@ on:
       emsdk_version:
         description: "Emscripten version (exact version once one works)"
         default: "latest"
+  schedule:
+    - cron: "0 6 * * 1"   # weekly: catches new upstream tags and Emscripten changes
 
 permissions:
   contents: read
@@ -17,14 +19,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The rc1 entry fails at fetch until the tag exists; that is reported, not hidden.
-        qemu_tag: ["v11.1.3", "v11.2.0-rc1"]
+        include:
+          - { qemu_tag: "v10.0.4", wasm_bits: "32" }   # main path, up to 4 GiB
+          - { qemu_tag: "v11.1.3", wasm_bits: "64" }   # comparison; libffi blocker expected
     env:
       QEMU_TAG: ${{ matrix.qemu_tag }}
+      WASM_BITS: ${{ matrix.wasm_bits }}
       EMSDK_VERSION: ${{ inputs.emsdk_version || 'latest' }}
     defaults:
       run:
-          working-directory: qemu-web/qemu-wasm64-spike
+        working-directory: qemu-wasm64-spike
     steps:
       - uses: actions/checkout@v4
 
@@ -56,7 +60,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: spike-${{ matrix.qemu_tag }}
+          name: spike-${{ matrix.qemu_tag }}-wasm${{ matrix.wasm_bits }}
           path: |
             qemu-wasm64-spike/REPORT.md
             qemu-wasm64-spike/upstream/
