@@ -5,11 +5,11 @@
 . "$(dirname "$0")/env.sh"
 configure_qemu() {
   rm -rf "$WORK/build"; mkdir -p "$WORK/build"; cd "$WORK/build"
-  export CFLAGS="-sMEMORY64=1 -pthread -O2 -I$PREFIX/include"
-  export LDFLAGS="-sMEMORY64=1 -pthread -L$PREFIX/lib"
+  export CFLAGS="$WASM_CFLAGS -I$PREFIX/include"
+  export LDFLAGS="$WASM_LDFLAGS -L$PREFIX/lib"
   emconfigure "$WORK/qemu/configure" \
     --cc=emcc --cxx=em++ --host-cc=gcc \
-    --cpu=wasm64 \
+    --cpu=wasm${WASM_BITS} \
     --target-list=x86_64-softmmu \
     --without-default-features \
     --enable-tcg-interpreter \
