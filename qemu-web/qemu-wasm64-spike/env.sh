@@ -1,12 +1,20 @@
 # Shared settings. Override any of these from the environment.
 export SPIKE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export QEMU_REPO="${QEMU_REPO:-https://gitlab.com/qemu-project/qemu.git}"
-export QEMU_TAG="${QEMU_TAG:-v11.1.3}"          # pinned; try v11.2.0-rc1 only after it exists
+export QEMU_TAG="${QEMU_TAG:-v10.0.4}"          # last line that still builds on 32-bit hosts
+export WASM_BITS="${WASM_BITS:-32}"          # 32 (up to 4 GiB) or 64 (needs libffi port)
 export EMSDK_VERSION="${EMSDK_VERSION:-latest}" # pin an exact version once one works
 export ZLIB_VERSION="${ZLIB_VERSION:-1.3.1}"
 export LIBFFI_VERSION="${LIBFFI_VERSION:-3.4.6}"
 export PIXMAN_VERSION="${PIXMAN_VERSION:-0.43.4}"
 export GLIB_VERSION="${GLIB_VERSION:-2.80.5}"
+if [ "$WASM_BITS" = 64 ]; then
+  export WASM_CFLAGS="-sMEMORY64=1 -pthread -O2"
+  export WASM_LDFLAGS="-sMEMORY64=1 -pthread"
+else
+  export WASM_CFLAGS="-pthread -O2"
+  export WASM_LDFLAGS="-pthread -sMAXIMUM_MEMORY=4gb -sALLOW_MEMORY_GROWTH=1"
+fi
 export WORK="${WORK:-$SPIKE_ROOT/work}"
 export PREFIX="$WORK/prefix"
 export LOGS="$WORK/logs"
