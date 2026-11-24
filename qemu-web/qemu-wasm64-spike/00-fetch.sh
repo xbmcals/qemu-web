@@ -7,8 +7,8 @@ peeled=$(git ls-remote "$QEMU_REPO" "refs/tags/${QEMU_TAG}^{}" | cut -f1)
 direct=$(git ls-remote "$QEMU_REPO" "refs/tags/${QEMU_TAG}" | cut -f1)
 commit="${peeled:-$direct}"
 if [ -z "$commit" ]; then
-  echo "Tag $QEMU_TAG not found in $QEMU_REPO. Recent v11 tags:" >&2
-  git ls-remote --tags "$QEMU_REPO" 'v11.*' | sed 's#.*refs/tags/##' | grep -v '\^{}' | tail -n 15 >&2
+  echo "Tag $QEMU_TAG not found in $QEMU_REPO. Recent tags:" >&2
+  git ls-remote --tags "$QEMU_REPO" "${QEMU_TAG%%.*}.*" | sed 's#.*refs/tags/##' | grep -v '\^{}' | tail -n 15 >&2
   exit 1
 fi
 if [ ! -d "$WORK/qemu/.git" ]; then
